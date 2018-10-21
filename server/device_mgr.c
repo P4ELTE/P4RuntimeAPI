@@ -132,6 +132,33 @@ grpc_c_status_t dev_mgr_write(P4__V1__WriteRequest *request) {
 
 grpc_c_status_t dev_mgr_read(P4__V1__ReadRequest *request) {
         grpc_c_status_t status;
+	return status;
+}
 
+grpc_c_status_t dev_mgr_set_pipeline_config(P4__V1__SetForwardingPipelineConfigRequest__Action action, P4__V1__ForwardingPipelineConfig *config) {
+	grpc_c_status_t status;
+	size_t i;
+	P4__Config__V1__Table *table;
+	P4__Config__V1__Action *taction;
+	P4__Config__V1__Preamble *preamble;
+
+	P4__Config__V1__P4Info *info = config->p4info;
+
+	for (i=0;i<info->n_tables;++i) {
+		table = info->tables[i];
+		preamble = table->preamble;
+		printf("TABLE id: %d name:%s\n", preamble->id, preamble->name); 
+	}
+
+	for (i=0;i<info->n_actions;++i) {
+		taction = info->actions[i];
+		preamble = taction->preamble;
+		printf("ACTION id: %d name:%s\n", preamble->id, preamble->name); 
+	}
+
+
+	status.gcs_code = GOOGLE__RPC__CODE__OK;
+
+	return status;
 }
 

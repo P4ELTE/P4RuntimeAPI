@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "google/rpc/code.grpc-c.h"
 #include "p4/v1/p4runtime.grpc-c.h"
+#include "p4/config/v1/p4info.grpc-c.h"
 
 
 typedef struct device_mgr_t {
@@ -29,5 +30,6 @@ grpc_c_status_t dev_mgr_write(P4__V1__WriteRequest *request);
 
 grpc_c_status_t dev_mgr_read(P4__V1__ReadRequest *request);
 
+grpc_c_status_t dev_mgr_set_pipeline_config(P4__V1__SetForwardingPipelineConfigRequest__Action action, P4__V1__ForwardingPipelineConfig *config);
 
 #endif /* __DEVICE_MGR_H__ */
