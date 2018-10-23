@@ -8,31 +8,59 @@ grpc_c_status_t table_insert(device_mgr_t *dm, P4__V1__TableEntry* table_entry) 
 	uint32_t action_id;
 	size_t i;
 	uint16_t value16 = 0;
+	int32_t prefix_len = 0; /* in bits */
+
 	grpc_c_status_t status;
 	P4__V1__FieldMatch *match;
 	P4__V1__TableAction *action;
 	P4__V1__FieldMatch__Exact *exact;
+	P4__V1__FieldMatch__LPM *lpm;
+	P4__V1__FieldMatch__Ternary *ternary;
+	
 	P4__V1__Action *tmp_act;
 	P4__V1__Action__Param *param;
-
-
+	
 	table_id = table_entry->table_id;
+
+	element_t *elem = get_element(&(dm->id_map), table_id);
+	argument_t *arg = NULL;
 
 	for (i=0;i<table_entry->n_match;i++) {
 		match = table_entry->match[i];
-		
+		field_id = match->field_id;
+		arg = get_argument(elem, field_id);
+		if (arg==NULL) {
+			printf("NULL ARGUMENT for FIELD_ID=%d\n", field_id);
+		}
 		switch(match->field_match_type_case) {
 			case P4__V1__FIELD_MATCH__FIELD_MATCH_TYPE_EXACT:
 				exact = match->exact;
-				field_id = match->field_id;
 				if (exact->value.len>=2) value16 = ntohs(*(uint16_t*)(exact->value.data));
-				printf("EXACT MATCH TableID:%d (%s) FieldID:%d KEY_LENGTH:%d VALUE16: %d  -- ", table_id,get_element(&(dm->id_map), table_id)->value, field_id, exact->value.len, value16); /* len - length , data - uint8_t* */
+				printf("EXACT MATCH TableID:%d (%s) FieldID:%d (%s) KEY_LENGTH:%d VALUE16: %d  -- ", table_id, elem->value, field_id, arg->name , exact->value.len, value16); /* len - length , data - uint8_t* */
 				status.gcs_code = GOOGLE__RPC__CODE__OK;
 				break;
+			case P4__V1__FIELD_MATCH__FIELD_MATCH_TYPE_LPM:
+				lpm = match->lpm;
+				prefix_len = lpm->prefix_len;
+                                if (lpm->value.len>=2) value16 = ntohs(*(uint16_t*)(lpm->value.data));
+				printf("LPM MATCH TableID:%:%d (%s) FieldID:%d (%s) KEY_LENGTH:%d VALUE16: %d PREFIX_LEN: %d  -- ", table_id, elem->value, field_id, arg->name, lpm->value.len, value16, prefix_len);
+				status.gcs_code = GOOGLE__RPC__CODE__OK;
+				break;
+			case P4__V1__FIELD_MATCH__FIELD_MATCH_TYPE_TERNARY:
+				ternary = match->ternary;
+				printf("TERNARY MATCH TableID:%d (%s) FieldID:%d (%s) KEY_LENGTH:%d VALUE16: %d M_LEN:%d MASK:%d  -- ", table_id, elem->value, field_id, arg->name, ternary->value.len, ternary->value.data[0], ternary->mask.len, ternary->mask.data[0]); /* len - length , data - uint8_t* */
+                                status.gcs_code = GOOGLE__RPC__CODE__OK;
+                                break;
+
+			case P4__V1__FIELD_MATCH__FIELD_MATCH_TYPE_RANGE:	
 			default:
 				status.gcs_code = GOOGLE__RPC__CODE__UNIMPLEMENTED;
 				break;
 		}
+	}
+
+	if (table_entry->has_is_default_action && table_entry->is_default_action) { /* n_match is 0 in this case */
+		printf("set_default_action\n");
 	}
 
 	action = table_entry->action;
@@ -41,12 +69,14 @@ grpc_c_status_t table_insert(device_mgr_t *dm, P4__V1__TableEntry* table_entry) 
 		case P4__V1__TABLE_ACTION__TYPE_ACTION:
 			tmp_act = action->action;
 			action_id = tmp_act->action_id;
-			printf("ActionID: %d (%s) PARAMS:\n", action_id, get_element(&(dm->id_map),action_id)->value); 
+			elem = get_element(&(dm->id_map), action_id);
+			printf("ActionID: %d (%s) PARAMS:\n", action_id, elem->value); 
 			for (i=0;i<tmp_act->n_params;i++) {
 				param = tmp_act->params[i];
+				arg = get_argument(elem, param->param_id);
 				if (param->value.len>=2) value16 = ntohs(*(uint16_t*)(param->value.data));
 				else value16 = 0;
-				printf(" ( id: %d, vlen: %d, value16: %d )", param->param_id, param->value.len, value16);  
+				printf(" ( id: %d (%s), vlen: %d, value16: %d )", param->param_id, arg->name, param->value.len, value16);  
 			}
 			printf(" -\n");
 			status.gcs_code = GOOGLE__RPC__CODE__OK;
@@ -130,7 +160,7 @@ grpc_c_status_t dev_mgr_write(device_mgr_t *dm, P4__V1__WriteRequest *request) {
 	return status;
 }
 
-grpc_c_status_t dev_mgr_read(P4__V1__ReadRequest *request) {
+grpc_c_status_t dev_mgr_read(device_mgr_t *dm, P4__V1__ReadRequest *request) {
         grpc_c_status_t status;
 	return status;
 }

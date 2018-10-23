@@ -60,5 +60,13 @@ void destroy_map(map_t *map) {
 	}
 }
 
+argument_t* get_argument( element_t *elem, uint64_t id) {
+	size_t i;
 
+	for(i=0;i<elem->n_args;++i) {
+		if (elem->args[i].id == id) return &(elem->args[i]);
+	}
+
+	return NULL;
+}
 

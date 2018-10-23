@@ -37,6 +37,7 @@ element_t* get_element(map_t *map, uint64_t key);
 element_t* add_element(map_t *map, uint64_t key, char* value);
 void init_map(map_t *map);
 void destroy_map(map_t *map);
+argument_t* get_argument( element_t *elem, uint64_t id);
 
 #endif /* __T4P4S_MAP_C_*/
 

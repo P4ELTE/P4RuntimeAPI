@@ -28,7 +28,7 @@ grpc_c_status_t table_write(device_mgr_t *dm, P4__V1__Update__Type update, P4__V
 
 grpc_c_status_t dev_mgr_write(device_mgr_t *dm, P4__V1__WriteRequest *request);
 
-grpc_c_status_t dev_mgr_read(P4__V1__ReadRequest *request);
+grpc_c_status_t dev_mgr_read(device_mgr_t *dm, P4__V1__ReadRequest *request);
 
 grpc_c_status_t dev_mgr_set_pipeline_config(device_mgr_t *dm, P4__V1__SetForwardingPipelineConfigRequest__Action action, P4__V1__ForwardingPipelineConfig *config);
 
