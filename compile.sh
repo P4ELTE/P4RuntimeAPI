@@ -24,5 +24,7 @@ gcc ${IFLAGS} -c -o obj/pi_server.o server/pi_server.c
 
 gcc ${IFLAGS} -c -o obj/device_mgr.o server/device_mgr.c
 
+gcc ${IFLAGS} -c -o obj/map.o utils/map.c
+
 gcc ${IFLAGS} -o pi_server obj/*.o ${GRPCDIR}/lib/.libs/libgrpc-c.so ${LFLAGS}
 

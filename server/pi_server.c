@@ -6,6 +6,8 @@
 #include "PI/proto/pi_server.h"
 #include "device_mgr.h"
 
+static device_mgr_t dm;
+
 void gnmi__g_nmi__capabilities_cb (grpc_c_context_t *context)
 {
 	 printf("gnmi__g_nmi__capabilities_cb\n");
@@ -45,7 +47,7 @@ void p4__v1__p4_runtime__write_cb (grpc_c_context_t *context)
     }
 
     grpc_c_status_t status;
-    status = dev_mgr_write( request );
+    status = dev_mgr_write(&dm,  request );
 
     /*
      * Finish response for RPC
@@ -159,7 +161,7 @@ void p4__v1__p4_runtime__set_forwarding_pipeline_config_cb (grpc_c_context_t *co
     }
 */
     grpc_c_status_t status;
-    status = dev_mgr_set_pipeline_config(request->action, request->config);
+    status = dev_mgr_set_pipeline_config(&dm, request->action, request->config);
 
     /*
      * Finish response for RPC
@@ -268,6 +270,7 @@ void PIGrpcServerCleanup() {
 int
 main (int argc, char **argv)
 {
+    dev_mgr_init(&dm);
 
     PIGrpcServerRun();
 

@@ -3,8 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h> 
+#include <stddef.h>
 
-char* get_element(map_t *map, uint64_t key)
+element_t* get_element(map_t *map, uint64_t key)
 {
 	int index = (key % MAX_HASH_SIZE)*REDUNDANCY_MAP;
 	int i = 0;
@@ -12,13 +13,15 @@ char* get_element(map_t *map, uint64_t key)
 		if (map->data[i]==NULL)
 			break;
 		if (map->data[i]->key == key)
-			return map->data[i]->value;
+			return map->data[i];
 	}
 	
 	return NULL;
 }
 
-bool add_element(map_t *map, uint64_t key, char* value)
+
+
+element_t* add_element(map_t *map, uint64_t key, char* value)
 {
 	int index = (key % MAX_HASH_SIZE)*REDUNDANCY_MAP;
 	int i = 0;
@@ -30,11 +33,12 @@ bool add_element(map_t *map, uint64_t key, char* value)
 			new_value = malloc(strlen(value)+1);
 			strcpy(new_value, value);
 			map->data[i]->value = new_value;
-			return true;
+			map->data[i]->n_args = 0;
+			return map->data[i];
 		}
 	}
 	
-	return false;
+	return NULL;
 
 }
 
