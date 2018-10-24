@@ -267,10 +267,15 @@ void PIGrpcServerCleanup() {
   /*delete server_data;*/
 }
 
+void dummy_callback(struct p4_ctrl_msg* ctrl_m) {
+	printf("Dummy callback - table_name::%s\n", ctrl_m->table_name);
+}
+
+
 int
 main (int argc, char **argv)
 {
-    dev_mgr_init(&dm);
+    dev_mgr_init_with_t4p4s(&dm, dummy_callback);
 
     PIGrpcServerRun();
 
