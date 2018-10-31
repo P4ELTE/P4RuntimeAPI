@@ -51,6 +51,7 @@ grpc_c_status_t table_insert(device_mgr_t *dm, P4__V1__TableEntry* table_entry) 
 	uint32_t field_id;
 	uint32_t action_id;
 	uint16_t value16; /* TODO: remove after testing */
+	uint8_t ip[4]; /* TODO: remove after testing */
 	size_t i;
 	int32_t prefix_len = 0; /* in bits */
 
@@ -92,8 +93,13 @@ grpc_c_status_t table_insert(device_mgr_t *dm, P4__V1__TableEntry* table_entry) 
 			case P4__V1__FIELD_MATCH__FIELD_MATCH_TYPE_LPM:
 				lpm = match->lpm;
 				prefix_len = lpm->prefix_len;
-                                if (lpm->value.len>=2) value16 = ntohs(*(uint16_t*)(lpm->value.data));
-				printf("LPM MATCH TableID:%:%d (%s) FieldID:%d (%s) KEY_LENGTH:%d VALUE16: %d PREFIX_LEN: %d  -- \n", table_id, elem->value, field_id, arg->name, lpm->value.len, value16, prefix_len);
+                                if (lpm->value.len>=4) {
+					ip[0] = lpm->value.data[0];
+					ip[1] = lpm->value.data[1];
+					ip[2] = lpm->value.data[2];
+					ip[3] = lpm->value.data[3];
+				}
+				printf("LPM MATCH TableID:%:%d (%s) FieldID:%d (%s) KEY_LENGTH:%d VALUE_IP: %d.%d.%d.%d PREFIX_LEN: %d  -- \n", table_id, elem->value, field_id, arg->name, lpm->value.len, (int)ip[0], (int)ip[1], (int)ip[2], (int)ip[3],  prefix_len);
 				ctrl_m.field_matches[ctrl_m.num_field_matches] = _gen_match_rule_lpm(arg, lpm);
 				ctrl_m.num_field_matches++;
 				status.gcs_code = GOOGLE__RPC__CODE__OK;
