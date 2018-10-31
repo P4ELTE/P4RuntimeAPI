@@ -33,4 +33,24 @@ Currently pi_server is bound to 172.17.0.1:50051 (the docker if for testing purp
 sudo ./pi_server
 ```
 
+## L2FWD Controller example
+First the p4runtime and IR json files should be generated from the P4 description:
+```
+p4c-bm2-ss --p4v 14 --p4runtime-file l2fwd14.p4runtime --p4runtime-format text --toJSON l2fwd14.json  t4p4s/examples/l2fwd.p4_14
+```
 
+After that we can execute the controller:
+```
+python l2.py --p4info l2fwd14.p4runtime --bmv2-json l2fwd14.json --ip 172.17.0.1
+```
+
+## L3FWD Controller example
+First the p4runtime and IR json files should be generated from the P4 description:
+```
+p4c-bm2-ss --p4v 14 --p4runtime-file l3fwd14.p4runtime --p4runtime-format text --toJSON l3fwd14.json  t4p4s/examples/l3fwd-with-chksm.p4_14
+```
+
+After that we can execute the controller:
+```
+python l3.py --p4info l3fwd14.p4runtime --bmv2-json l3fwd14.json --ip 172.17.0.1
+```
