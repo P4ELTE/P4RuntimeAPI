@@ -7,6 +7,7 @@
 #include "device_mgr.h"
 
 static device_mgr_t dm;
+device_mgr_t *dev_mgr_ptr = &dm;
 
 void gnmi__g_nmi__capabilities_cb (grpc_c_context_t *context)
 {
@@ -265,21 +266,5 @@ void PIGrpcServerForceShutdown(int deadline_seconds) {
 
 void PIGrpcServerCleanup() {
   /*delete server_data;*/
-}
-
-void dummy_callback(struct p4_ctrl_msg* ctrl_m) {
-	printf("Dummy callback - table_name::%s\n", ctrl_m->table_name);
-}
-
-
-int
-main (int argc, char **argv)
-{
-    dev_mgr_init_with_t4p4s(&dm, dummy_callback);
-
-    PIGrpcServerRun();
-
-    PIGrpcServerWait();
-
 }
 
