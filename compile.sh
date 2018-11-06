@@ -39,6 +39,14 @@ gcc ${DEBUG} ${IFLAGS} -o pi_server server/test_server.c obj/*.o ${GRPCDIR}/lib/
 mkdir -p static_lib
 ar rcs static_lib/libp4rt.a obj/*.o
 
+mkdir -p include
+mkdir -p include/p4rt
+mkdir -p include/utils
+cp server/device_mgr.h include/p4rt/
+cp server/config.h include/
+cp utils/map.h include/utils/
+
+
 echo "Static library is available in folder ./static_lib"
 echo "Usage example:"
 echo "gcc ${IFLAGS} server/test_server.c -L./static_lib -lp4rt -L${GRPCDIR}/lib/.libs -lgrpc-c ${LFLAGS} -o test_server"
