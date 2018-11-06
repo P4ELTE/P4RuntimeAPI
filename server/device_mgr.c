@@ -38,10 +38,19 @@ struct p4_field_match_header* _gen_match_rule_ternary(argument_t *arg, P4__V1__F
 
 struct p4_action_parameter* _gen_action_param(argument_t *arg, P4__V1__Action__Param *param) {
 	struct p4_action_parameter *result = malloc(sizeof(struct p4_action_parameter));
+	uint16_t *tmp16;
+	uint32_t *tmp32;
 
 	strcpy(result->name, arg->name);
 	result->length = arg->bitwidth;
 	memcpy(result->bitmap, param->value.data, param->value.len);
+	if (param->value.len==2) {
+		tmp16 = (uint16_t*)result->bitmap;
+		*tmp16 = htons(*tmp16);
+	} else if (param->value.len==4) {
+		tmp32 = (uint32_t*)result->bitmap;
+		*tmp32 = htonl(*tmp32);
+        }
 
 	return result; /* TODO: NTOH  */
 }
