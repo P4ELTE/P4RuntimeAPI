@@ -131,6 +131,7 @@ grpc_c_status_t table_insert(device_mgr_t *dm, P4__V1__TableEntry* table_entry) 
 			tmp_act = action->action;
 			action_id = tmp_act->action_id;
 			elem = get_element(&(dm->id_map), action_id);
+			ctrl_m.action_name = strdup(elem->value);
 			for (i=0;i<tmp_act->n_params;i++) {
 				param = tmp_act->params[i];
 				arg = get_argument(elem, param->param_id);
